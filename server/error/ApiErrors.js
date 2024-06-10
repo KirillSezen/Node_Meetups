@@ -1,4 +1,5 @@
 const { application } = require("express")
+const { StatusCodes } = require('http-status-codes')
 
 class ApiErrors extends Error {
     constructor(status, message) {
@@ -8,15 +9,15 @@ class ApiErrors extends Error {
     }
 
     static badRequest(message) {
-        return new ApiErrors(404, message)
+        return new ApiErrors(StatusCodes.BAD_REQUEST, message)
     }
 
     static forbidden(message) {
-        return new ApiErrors(403, message)
+        return new ApiErrors(StatusCodes.FORBIDDEN, message)
     }
 
     static internal(message) {
-        return new ApiErrors(500, message)
+        return new ApiErrors(StatusCodes.INTERNAL_SERVER_ERROR, message)
     }
 }
 

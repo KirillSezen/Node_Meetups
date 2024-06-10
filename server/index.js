@@ -6,6 +6,7 @@ const models = require('./models/models')
 const cors = require('cors')
 const router = require('./routes/index')
 const errorHandler = require('./middleware/ErrorHandlingMiddleware')
+const initDatabase = require('./dbInitialization')
 
 const PORT = process.env.PORT || 3000;
 
@@ -18,8 +19,7 @@ app.use(errorHandler)
 
 const start = async () => {
     try {
-        await sequelize.authenticate()
-        await sequelize.sync()
+        initDatabase()
         app.listen(PORT, () => console.log(`Server started on ${PORT}`))
     } catch(e) {
         console.log(e)

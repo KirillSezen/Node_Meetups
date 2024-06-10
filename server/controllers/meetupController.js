@@ -5,9 +5,9 @@ class MeetupController {
         res.json('meetups')
     }
 
-    async getCurrentMeetup(req, res, next) {
+    async getCurrentMeetup(req, res, _next) {
         const {id} = req.query
-        if(!id) return next(ApiErrors.badRequest("no id"))
+        if(!id) return _next(ApiErrors.badRequest("no id"))
 
             res.json(id)
     }
