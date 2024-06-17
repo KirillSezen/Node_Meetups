@@ -12,6 +12,18 @@ class ApiErrors extends Error {
         return new ApiErrors(StatusCodes.BAD_REQUEST, message)
     }
 
+    static unauthorized(message) {
+        return new ApiErrors(StatusCodes.UNAUTHORIZED, message)
+    }
+
+    static notFound(message) {
+        return new ApiErrors(StatusCodes.NOT_FOUND, message)
+    }
+
+    static serviceUnavailable(message) {
+        return new ApiErrors(StatusCodes.SERVICE_UNAVAILABLE, message)
+    }
+
     static forbidden(message) {
         return new ApiErrors(StatusCodes.FORBIDDEN, message)
     }
