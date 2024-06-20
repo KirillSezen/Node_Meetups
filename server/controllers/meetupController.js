@@ -1,109 +1,44 @@
-const ApiErrors = require('../error/ApiErrors')
-const Meetup = require('../models/meetupModel')
-const User = require('../models/userModel')
-const KeyWord = require('../models/keywordModel')
-const { Op } = require("sequelize")
-const meetupDto = require('../dtos/meetupDto')
+const MeetupService = require('../services/meetupService')
+const { sendResponse } = require('../services/responseService');
+const {DEFAULT_PAGE, DEFAULT_LIMIT} = require('../config/constants')
 
 class MeetupController {
     async getAllMeetups(req, res) {
-    let { limit, page, search, sort, order, description } = req.query;
-    page = page || 1;
-    limit = limit || 9;
-    let offset = page * limit - limit;
-
-    let whereConditions = {};
-    let orderConditions = [];
-
-    if (search) {
-        whereConditions = {
-            [Op.or]: [
-                { name: { [Op.iLike]: `%${search}%` } },
-                { description: { [Op.iLike]: `%${search}%` } }
-            ]
-        };
+    const { limit = DEFAULT_LIMIT, page = DEFAULT_PAGE, search, sort, order, description } = req.query;
+    const meetups = await MeetupService.getAllMeetups(limit, page, search, sort, order, description)
+    sendResponse(res, meetups)
     }
 
-    if (description) {
-        whereConditions = { ...whereConditions, description: {
-            [Op.ne]: null,
-            [Op.ne]: ''
-        }};
-    }
- 
-    if (sort && order) {
-        orderConditions = [[sort, order]];
-    }
-
-    const meetups = await Meetup.findAll({
-        limit,
-        offset,
-        where: whereConditions,
-        include: [
-            {
-                model: KeyWord,
-                attributes: ['word'],
-                through: {
-                    attributes: []
-                },
-                required: false
-            }
-        ],
-        order: orderConditions
-    });
-
-    return res.json(meetups);
-    }
-
-    async getCurrentMeetup(req, res, _next) {
+    async getCurrentMeetup(req, res) {
         const {id} = req.params
-        const meetup = await Meetup.findOne({
-            where: {id},
-            include: [
-                {
-                    model: KeyWord,
-                    attributes: ['word'],
-                    through: {
-                        attributes: []
-                    }
-                } 
-            ]
-        })
-        res.json(meetup)
+        const meetup = await MeetupService.getCurrentMeetup(id)
+        sendResponse(res, meetup)
     }
 
     async createMeetup(req, res) {
-        const {error} = meetupDto.createMeetupSchema.validate(req.body)
-            if (error) {
-                return ApiErrors.badRequest(error.details[0].message)
-            }
-
        const {name, description, time, place} = req.body
-       const user = await User.findByPk(req.user.id)
-       const meetup = await user.createMeetup({name, description, time, place, userId: req.user.id})
-       return res.json(meetup)
+       const result = await MeetupService.createMeetup(name, description, time, place, req.user.id) 
+       sendResponse(res, result)
     }
 
     async editMeetup(req, res) {
-        const {error} = meetupDto.updateMeetupSchema.validate(req.body)
-            if (error) {
-                return ApiErrors.badRequest(error.details[0].message)
-            }
-
         const {id} = req.params
-        const newName = req.body.name
-        const newDescription = req.body.description
-        const newTime = req.body.time
-        const newPlace = req.body.place
-        
-        const result = await Meetup.update({name: newName, description: newDescription, time: newTime, place: newPlace}, {where: {id}})
-        res.json(result)
+        const {name, description, time, place} = req.body
+        const result = await MeetupService.updateMeetup(name, description, time, place, id)
+        sendResponse(res, result)
     }
 
     async deleteMeetup(req, res) {
         const {id} = req.params
-        const result = await Meetup.destroy({where: {id}})
-        return res.json(result)
+        const result = await MeetupService.deleteMeetup(id)
+        sendResponse(res, result)
+    }
+
+    async signupToMeetup(req, res) {
+        const {id} = req.params
+        const userId = req.user.id
+        const result = await MeetupService.signupToMeetup(id, userId)
+        sendResponse(res, result)
     }
 }
 
