@@ -1,7 +1,8 @@
 const Router = require('express')
 const meetupController = require('../controllers/meetupController')
 const isOrganizer = require('../middleware/CheckRoleMiddleware')
-const {validateCreateMeetup, validateUpdateMeetup, validateAllMeetupsQuery} = require('../middleware/DtoValidationMiddleware')
+const {validateByDtos} = require('../middleware/DtoValidationMiddleware')
+const meetupDto = require('../dtos/meetupDto')
 const passport = require('passport')
 
 const router = new Router()
@@ -28,7 +29,7 @@ const router = new Router()
 
 router.get(
     '/',
-    validateAllMeetupsQuery,
+    validateByDtos(meetupDto.allMeetupsQuerySchema),
     meetupController.getAllMeetups
 )
 
@@ -83,7 +84,7 @@ router.post(
     '/',
     passport.authenticate('jwt', {session: false}),
     isOrganizer,
-    validateCreateMeetup,
+    validateByDtos(meetupDto.createMeetupSchema),
     meetupController.createMeetup
 )
 
@@ -120,7 +121,7 @@ router.patch(
     '/:id',
     passport.authenticate('jwt', {session: false}),
     isOrganizer,
-    validateUpdateMeetup,
+    validateByDtos(meetupDto.updateMeetupSchema),
     meetupController.editMeetup
 )
 

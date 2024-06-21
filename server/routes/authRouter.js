@@ -1,7 +1,8 @@
 const Router = require('express')
 const passport = require('passport')
 const authController = require('../controllers/authController')
-const {validateCreateUser} = require('../middleware/DtoValidationMiddleware')
+const {validateByDtos} = require('../middleware/DtoValidationMiddleware')
+const userDto = require('../dtos/userDto')
 
 const router = new Router()
 
@@ -44,7 +45,7 @@ const router = new Router()
 
 router.post(
     '/registration',
-    validateCreateUser,
+    validateByDtos(userDto.createUserSchema),
     authController.reqistration
 )
 

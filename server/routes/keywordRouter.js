@@ -1,7 +1,8 @@
 const Router = require('express')
 const keywordController = require('../controllers/keywordController')
 const isOrganizer = require('../middleware/CheckRoleMiddleware')
-const {validateCreateKeyword, validateUpdateKeyword} = require('../middleware/DtoValidationMiddleware')
+const {validateByDtos} = require('../middleware/DtoValidationMiddleware')
+const keywordDto = require('../dtos/keywordDto')
 const passport = require('passport')
 
 const router = new Router()
@@ -56,7 +57,7 @@ router.post(
     '/',
     passport.authenticate('jwt', {session: false}),
     isOrganizer,
-    validateCreateKeyword,
+    validateByDtos(keywordDto.createKeywordSchema),
     keywordController.createKeyWord
 )
 
@@ -93,7 +94,7 @@ router.patch(
     '/:id',
     passport.authenticate('jwt', {session: false}),
     isOrganizer,
-    validateUpdateKeyword,
+    validateByDtos(keywordDto.updateKeywordSchema),
     keywordController.editKeyWord
 )
 

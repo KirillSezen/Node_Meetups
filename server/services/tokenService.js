@@ -15,7 +15,7 @@ class TokenService {
         if(!user) {
             return ApiErrors.unauthorized("User not found")
         }
-        const accessToken = jwt.sign({email: user.email, id: user.id}, process.env.JWT_ACCESS, {expiresIn: '30m'})
+        let accessToken = jwt.sign({email: user.email, id: user.id}, process.env.JWT_ACCESS, {expiresIn: '30m'})
         return accessToken
     }
 }
